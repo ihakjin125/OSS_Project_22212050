@@ -52,7 +52,7 @@
 ## 2. System context diagram
 
 <p align="center">
-  <img src ="https://github.com/user-attachments/assets/c234326a-0203-4006-a10f-50ef4f680b8a" width="80%">
+  <img src ="https://github.com/user-attachments/assets/89aa7f56-8180-497d-9641-f2dd9db24ca2" width="80%">
 </p>
 
 <br> 
