@@ -52,7 +52,7 @@
 ## 2. System context diagram
 
 <p align="center">
-  <img src ="https://github.com/user-attachments/assets/89aa7f56-8180-497d-9641-f2dd9db24ca2" width="80%">
+  <img src ="https://github.com/user-attachments/assets/d2880fed-bd45-4fe3-a474-5a3d9fa2a353" width="80%">
 </p>
 
 <br> 
@@ -69,7 +69,7 @@
 | ● **Request Guide** | 옷차림 추천 가이드 요청 |
 | ● **Send Feedback** | 체감 온도 피드백 전송 |
 | ● **Show Guide** | 가이드 결과 제공 |
-| ● **Get Weather Data** | 기상 데이터 요청 |
+| ● **Request Weather Data** | 기상 데이터 요청 |
 | ● **Return Weather Data** | 기상 데이터 반환 |
 | ● **Save Profile** | 프로필 정보 저장 |
 | ● **Update Weight** | 체질 가중치 업데이트 |
@@ -130,7 +130,7 @@
 |:---|:---|
 | **Description** | 시스템이 연산을 마치고, 사용자에게 최적화된 맞춤형 옷차림 가이드 결과를 화면에 제공한다.  |
 
-**9) Get Weather Data**
+**9) Request Weather Data**
 
 | Actor | Weather API |
 |:---|:---|
@@ -242,7 +242,7 @@
 | **Dynamics** |시스템이 옷차림 추천 알고리즘 연산을 완료한 직후.|
 | **Goals** |가이드 결과 제공 화면을 구현한다.|
 
-**9. Get Weather Data**
+**9. Request Weather Data**
 
 | 구분 | 내용 |
 |:---|:---|
