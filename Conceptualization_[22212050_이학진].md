@@ -17,7 +17,7 @@
 
 ---
 
-## = Contents =
+##  Contents 
 1. Business purpose
 2. System context diagram
 3. Use case list
