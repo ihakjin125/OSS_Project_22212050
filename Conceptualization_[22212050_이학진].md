@@ -3,7 +3,7 @@
 
 **Title:**  WhatToWear(왓 투 웨어)
 
-**Student NO:** 22212050
+**Student No:** 22212050
 
 **Name:** 이학진
 
