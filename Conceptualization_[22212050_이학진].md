@@ -1,4 +1,4 @@
-# Conceptualization
+# 1. Conceptualization
 <img width="2816" height="1536" alt="왓투웨어로고" src="https://github.com/user-attachments/assets/0c3c9f1f-136f-4092-a8b4-4b55ec83d665" />
 
 **Title:**  WhatToWear(왓 투 웨어)
