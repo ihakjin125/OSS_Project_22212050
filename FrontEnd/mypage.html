@@ -56,29 +56,42 @@
 
 <script>
     window.onload = function() {
-        const savedNickname = localStorage.getItem('nickname');
-        if (savedNickname) {
-            document.getElementById('display-nickname').innerText = savedNickname;
+        // 🌟 1. 백엔드와 통신해서 진짜 닉네임 가져오기 🌟
+        let loginId = localStorage.getItem('loggedInUser'); // (주의: 로그인 화면에서 저장하는 키 이름과 일치해야 함)
+
+        if (loginId) {
+            // 쌍따옴표 및 공백 제거 (안전 장치)
+            loginId = loginId.replace(/['"]/g, '').trim();
+
+            // 우리가 아까 컨트롤러에 만든 API로 닉네임 요청!
+            fetch(`/api/main/member/nickname?loginId=${loginId}`)
+                .then(response => {
+                    if(response.ok) return response.text();
+                    throw new Error("닉네임 못 가져옴");
+                })
+                .then(realNickname => {
+                    // 성공적으로 가져오면 화면에 '학진' 등 진짜 닉네임으로 교체!
+                    document.getElementById('display-nickname').innerText = realNickname;
+                })
+                .catch(error => {
+                    console.log("닉네임 가져오기 실패:", error);
+                    document.getElementById('display-nickname').innerText = "회원"; // 에러 시 기본값
+                });
         }
 
-        // 가입 시 설정한 최초 '기본 체질' (변하지 않는 값)
+        // --- [아래는 기존 학진님이 짜두신 체질 UI 코드 그대로 유지] ---
         const baseConst = localStorage.getItem('base_constitution') || "0";
-
-        // 피드백 학습을 거쳐 계산된 최신의 '현재 내 체질' (슬라이더 및 주요 표시에 활용)
         const savedConst = localStorage.getItem('user_constitution') || "0";
 
-        // 1. 모든 점의 활성화 클래스 제거 (초기화)
         document.querySelectorAll('.slider-dot').forEach(dot => {
             dot.classList.remove('active');
         });
 
-        // 2. 현재 내 체질에 해당하는 점에 'active' 클래스 추가
         const activeDot = document.getElementById('dot-' + savedConst);
         if (activeDot) {
             activeDot.classList.add('active');
         }
 
-        // 3. 텍스트 표시 매핑 데이터
         const constText = {
             "-2": "❄️ 매우 추위를 많이 탐",
             "-1": "🧊 추위를 조금 탐",
@@ -87,14 +100,16 @@
             "2": "🔥 더위를 매우 많이 탐"
         };
 
-        // 4. 각각의 영역에 텍스트 주입
         document.getElementById('display-base-constitution').innerText = constText[baseConst];
         document.getElementById('display-constitution').innerText = constText[savedConst];
     };
 
+    // 🌟 2. 로그아웃 기능 완벽 보완 🌟
     function logout() {
         if(confirm("로그아웃 하시겠습니까?")) {
-            // 로컬 저장소 데이터를 지울수도 있지만, 일단은 페이지 이동만 처리
+            // 방금 전 우리가 그토록 고생했던 그 원인! 여기서 깔끔하게 지워줍니다.
+            localStorage.clear();
+            // 로그인 화면으로 쫓아내기
             location.href = 'index.html';
         }
     }

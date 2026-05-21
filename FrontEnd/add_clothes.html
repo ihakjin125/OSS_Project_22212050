@@ -1,125 +1,144 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatToWear - 옷 등록</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="main-body">
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WhatToWear - 옷 등록</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="main-body">
 
-<nav class="navbar">
-    <a href="wardrobe.html" class="nav-item active">옷장</a>
-    <a href="main.html" class="nav-item">홈</a>
-    <a href="mypage.html" class="nav-item">마이</a>
-</nav>
+    <nav class="navbar">
+        <a href="wardrobe.html" class="nav-item active">옷장</a>
+        <a href="main.html" class="nav-item">홈</a>
+        <a href="mypage.html" class="nav-item">마이</a>
+    </nav>
 
-<div class="container main-container">
-    <div class="wardrobe-card">
+    <div class="container main-container">
+        <div class="wardrobe-card">
 
-        <div class="header-with-back">
-            <a href="wardrobe.html" class="back-btn">←</a>
-            <h2>➕ 새로운 옷 등록</h2>
+            <div class="header-with-back">
+                <a href="wardrobe.html" class="back-btn">←</a>
+                <h2>➕ 새로운 옷 등록</h2>
+            </div>
+
+            <form id="addClothesForm" class="add-clothes-form">
+
+                <div class="input-group">
+                    <label>옷 이름</label>
+                    <input type="text" id="clothesName" placeholder="예: 무지 반팔 티셔츠" required>
+                </div>
+
+                <div class="input-group">
+                    <label>카테고리</label>
+                    <div class="inline-radio-group">
+                        <input type="radio" id="cat-top" name="category" value="TOP" checked>
+                        <label for="cat-top">상의</label>
+
+                        <input type="radio" id="cat-bottom" name="category" value="BOTTOM">
+                        <label for="cat-bottom">하의</label>
+
+                        <input type="radio" id="cat-outer" name="category" value="OUTER">
+                        <label for="cat-outer">아우터</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>두께</label>
+                    <div class="inline-radio-group">
+                        <input type="radio" id="thick-thin" name="thickness" value="THIN">
+                        <label for="thick-thin">얇음</label>
+
+                        <input type="radio" id="thick-normal" name="thickness" value="NORMAL" checked>
+                        <label for="thick-normal">보통</label>
+
+                        <input type="radio" id="thick-thick" name="thickness" value="THICK">
+                        <label for="thick-thick">두꺼움</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>TPO 태그</label>
+                    <div class="inline-radio-group">
+                        <input type="radio" id="tpo-workout" name="tpo" value="WORKOUT">
+                        <label for="tpo-workout">🏃 운동</label>
+
+                        <input type="radio" id="tpo-daily" name="tpo" value="DAILY" checked>
+                        <label for="tpo-daily">🎒 일상</label>
+
+                        <input type="radio" id="tpo-formal" name="tpo" value="FORMAL">
+                        <label for="tpo-formal">👔 격식</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="main-action-btn" style="margin-top: auto;">옷장에 저장</button>
+            </form>
+
         </div>
-
-        <form id="addClothesForm" class="add-clothes-form">
-
-            <div class="input-group">
-                <label>옷 이름</label>
-                <input type="text" id="clothesName" placeholder="예: 무지 반팔 티셔츠" required>
-            </div>
-
-            <div class="input-group">
-                <label>카테고리</label>
-                <div class="inline-radio-group">
-                    <input type="radio" id="cat-top" name="category" value="TOP" checked>
-                    <label for="cat-top">상의</label>
-
-                    <input type="radio" id="cat-bottom" name="category" value="BOTTOM">
-                    <label for="cat-bottom">하의</label>
-
-                    <input type="radio" id="cat-outer" name="category" value="OUTER">
-                    <label for="cat-outer">아우터</label>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>두께</label>
-                <div class="inline-radio-group">
-                    <input type="radio" id="thick-thin" name="thickness" value="THIN">
-                    <label for="thick-thin">얇음</label>
-
-                    <input type="radio" id="thick-normal" name="thickness" value="NORMAL" checked>
-                    <label for="thick-normal">보통</label>
-
-                    <input type="radio" id="thick-thick" name="thickness" value="THICK">
-                    <label for="thick-thick">두꺼움</label>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>TPO 태그</label>
-                <div class="inline-radio-group">
-                    <input type="radio" id="tpo-workout" name="tpo" value="WORKOUT">
-                    <label for="tpo-workout">🏃 운동</label>
-
-                    <input type="radio" id="tpo-daily" name="tpo" value="DAILY" checked>
-                    <label for="tpo-daily">🎒 일상</label>
-
-                    <input type="radio" id="tpo-formal" name="tpo" value="FORMAL">
-                    <label for="tpo-formal">👔 격식</label>
-                </div>
-            </div>
-
-            <button type="submit" class="main-action-btn" style="margin-top: auto;">옷장에 저장</button>
-        </form>
-
     </div>
-</div>
 
-<script>
-    document.getElementById('addClothesForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    <script>
+        document.getElementById('addClothesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        // 1. 입력된 값들 수집
-        const name = document.getElementById('clothesName').value;
-        const category = document.querySelector('input[name="category"]:checked').value;
-        const thickness = document.querySelector('input[name="thickness"]:checked').value;
-        const tpo = document.querySelector('input[name="tpo"]:checked').value;
+            let loginId = localStorage.getItem('loggedInUser');
+            if (loginId) {
+                loginId = loginId.replace(/['"]/g, '').trim();
+            }
+            // ▼ 이 줄을 추가해서 눈으로 확인해 보세요!
+            alert("지금 백엔드로 쏘려는 아이디: " + loginId);
 
-        // 아이콘 매칭 (심미성을 위해)
-        let icon = "👕";
-        if (category === "BOTTOM") icon = "👖";
-        if (category === "OUTER") icon = "🧥";
+            if (!loginId) {
+                alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+                window.location.href = 'index.html';
+                return;
+            }
 
-        const newItem = {
-            name: `${icon} ${name}`,
-            category: category,
-            thickness: thickness,
-            tpo: tpo
-        };
+            // 2. 화면에서 입력된 값들 싹 수집하기
+            const name = document.getElementById('clothesName').value;
+            const category = document.querySelector('input[name="category"]:checked').value;
+            const thickness = document.querySelector('input[name="thickness"]:checked').value;
+            const tpo = document.querySelector('input[name="tpo"]:checked').value;
 
-        // 2. 기존 옷 목록 가져오기 (없으면 기본 3개 초기화)
-        let clothes = JSON.parse(localStorage.getItem('user_clothes'));
+            // 아이콘 매칭 (학진님의 센스 있는 로직 그대로 유지!)
+            let icon = "👕";
+            if (category === "BOTTOM") icon = "👖";
+            if (category === "OUTER") icon = "🧥";
+            const fullName = `${icon} ${name}`;
 
-        if (clothes === null) {
-            // 아직 한 번도 저장/삭제를 안 했다면 기본 리스트를 먼저 만듦
-            clothes = [
-                { name: "👕 흰 반팔", category: "TOP" },
-                { name: "👖 검정 슬랙스", category: "BOTTOM" },
-                { name: "🧥 두꺼운 패딩", category: "OUTER" }
-            ];
-        }
+            // 3. 백엔드로 보낼 JSON 데이터 예쁘게 포장하기
+            const clothesData = {
+                loginId: loginId,      // 이 옷의 주인 ID
+                name: fullName,        // 옷 이름 (아이콘 포함)
+                category: category,    // TOP, BOTTOM, OUTER
+                thickness: thickness,  // THIN, NORMAL, THICK
+                tpo: tpo               // WORKOUT, DAILY, FORMAL
+            };
 
-        // 3. 새 아이템 추가 및 저장
-        clothes.push(newItem);
-        localStorage.setItem('user_clothes', JSON.stringify(clothes));
-
-        alert('새로운 옷이 옷장에 등록되었습니다!');
-
-        // 4. 옷장 리스트로 이동
-        window.location.href = 'wardrobe.html';
-    });
-</script>
-</body>
-</html>
+            // 4. 백엔드 API로 로켓 발사! (POST 요청)
+            fetch('/api/main/clothes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(clothesData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("서버에 옷을 등록하지 못했습니다.");
+                    }
+                    return response.text();
+                })
+                .then(message => {
+                    alert("새로운 옷이 옷장에 완벽하게 등록되었습니다! 🎉");
+                    // 5. 성공하면 옷장 리스트 화면으로 돌아가기 (돌아가면 DB에서 새로 불러옴)
+                    window.location.href = 'wardrobe.html';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+        });
+    </script>
+    </body>
+    </html>

@@ -29,9 +29,8 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Clothes> clothesList = new ArrayList<>();
-}
 
-// ▼ 바로 여기에 Repository 인터페이스를 합쳤습니다! (클래스 1개로 치기 위한 꼼수입니다)
-interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByLoginId(String loginId);
+    public interface MemberRepository extends JpaRepository<Member, Long> {
+        Member findByLoginId(String loginId);
+    }
 }

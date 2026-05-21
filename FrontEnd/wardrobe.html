@@ -32,46 +32,81 @@
 </div>
 
 <script>
-    // 1. 기본 옷 목록을 변수로 따로 정의합니다.
-    const defaultClothes = [
-        { name: "👕 흰 반팔", category: "top" },
-        { name: "👖 검정 슬랙스", category: "bottom" },
-        { name: "🧥 두꺼운 패딩", category: "outer" }
-    ];
-
-    // 현재 데이터를 가져오는 공통 함수
-    function getClothes() {
-        const saved = localStorage.getItem('user_clothes');
-        // 저장된 게 아예 없으면(null) 기본 리스트를 반환하고, 있으면 저장된 걸 반환
-        if (saved === null) return defaultClothes;
-        return JSON.parse(saved);
-    }
-
+    // 1. 화면이 켜질 때 실행되는 함수
     window.onload = function() {
-        const clothes = getClothes();
-        const container = document.getElementById('clothes-container');
-        container.innerHTML = '';
+        const loginId = localStorage.getItem('loggedInUser');
 
-        clothes.forEach((item, index) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'clothes-item';
-            itemDiv.innerHTML = `
-                <span class="clothes-name">${item.name}</span>
-                <button class="more-btn" onclick="deleteCloth(${index})">⋮</button>
-            `;
-            container.appendChild(itemDiv);
-        });
+        // 로그인 안 했으면 로그인 화면으로 쫓아내기
+        if (!loginId) {
+            alert("로그인이 필요합니다.");
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // 내 옷장 데이터 불러오기
+        fetchClothes(loginId);
     };
 
-    function deleteCloth(index) {
-        if(confirm("이 옷을 옷장에서 삭제할까요?")) {
-            let clothes = getClothes(); // 현재 목록(기본값 또는 저장값)을 가져옴
+    // 2. 백엔드에서 내 옷 목록을 가져오는 진짜 통신 로직
+    function fetchClothes(loginId) {
+        const container = document.getElementById('clothes-container');
+        container.innerHTML = '<div class="clothes-item"><span class="clothes-name">옷장을 불러오는 중...</span></div>';
 
-            clothes.splice(index, 1); // 클릭한 녀석 '하나만' 삭제
+        // 백엔드 API 호출 (예: GET /api/clothes?loginId=qwer1234)
+        fetch(`/api/main/clothes?loginId=${loginId}`, {
+            method: 'GET'
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("옷장 데이터를 불러오는데 실패했습니다.");
+                return response.json(); // 백엔드에서 JSON 리스트를 준다고 가정
+            })
+            .then(clothes => {
+                container.innerHTML = ''; // "불러오는 중..." 글자 지우기
 
-            // 변경된 리스트를 저장 (이제부터는 기본값이 아닌 이 저장값을 사용하게 됨)
-            localStorage.setItem('user_clothes', JSON.stringify(clothes));
-            location.reload();
+                // 옷장이 비어있을 때
+                if (clothes.length === 0) {
+                    container.innerHTML = '<div class="clothes-item"><span class="clothes-name">옷장이 비어있습니다. 새 옷을 등록해보세요! 👕</span></div>';
+                    return;
+                }
+
+                // DB에서 가져온 옷들을 화면에 하나씩 그려주기
+                clothes.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'clothes-item';
+                    // item.id는 DB에 저장된 옷의 고유 번호(PK)
+                    itemDiv.innerHTML = `
+                    <span class="clothes-name">${item.name}</span>
+                    <button class="more-btn" onclick="deleteCloth(${item.id})">🗑️</button>
+                `;
+                    container.appendChild(itemDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = `<div class="clothes-item"><span class="clothes-name" style="color:red;">서버와 연결할 수 없습니다.</span></div>`;
+            });
+    }
+
+    // 3. 백엔드 DB에서 진짜로 옷을 삭제하는 통신 로직
+    function deleteCloth(clothesId) {
+        if(confirm("이 옷을 옷장에서 정말 삭제할까요?")) {
+
+            // 백엔드 API 호출 (예: DELETE /api/clothes/1)
+            fetch(`/api/main/clothes/${clothesId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if(response.ok) {
+                        alert("옷이 성공적으로 삭제되었습니다.");
+                        location.reload(); // 성공하면 새로고침해서 바뀐 리스트 띄우기
+                    } else {
+                        throw new Error("옷 삭제에 실패했습니다.");
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                    console.error('Error:', error);
+                });
         }
     }
 </script>

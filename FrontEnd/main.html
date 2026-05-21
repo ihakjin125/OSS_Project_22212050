@@ -105,7 +105,7 @@
 <script>
     // 1. 페이지 로드 시 로그인한 유저 아이디 가져오기
     window.onload = function() {
-        const loggedInUser = localStorage.getItem('loggedInUser');
+        let loggedInUser = localStorage.getItem('loggedInUser');
 
         // 로그인을 안 하고 주소창에 메인 화면을 치고 들어온 경우 쫓아내기
         if (!loggedInUser) {
@@ -114,11 +114,26 @@
             return;
         }
 
-        // 환영 메시지에 아이디 띄워주기 (나중엔 닉네임을 가져오도록 수정 가능)
-        const nicknameElement = document.getElementById('user-nickname');
-        if(nicknameElement) {
-            nicknameElement.innerText = loggedInUser;
-        }
+        // 🌟 아이디 다듬기 (쌍따옴표 제거)
+        loggedInUser = loggedInUser.replace(/['"]/g, '').trim();
+
+        // 🌟 백엔드에 닉네임 물어보기!
+        fetch(`/api/main/member/nickname?loginId=${loggedInUser}`)
+            .then(response => {
+                if(response.ok) return response.text();
+                throw new Error("닉네임 못 가져옴");
+            })
+            .then(realNickname => {
+                // 모달창에 있는 이름을 '진짜 닉네임'으로 교체!
+                const nicknameElement = document.getElementById('user-nickname');
+                if(nicknameElement) {
+                    nicknameElement.innerText = realNickname;
+                }
+            })
+            .catch(error => {
+                console.log("닉네임 가져오기 실패:", error);
+                document.getElementById('user-nickname').innerText = "회원";
+            });
 
         console.log("현재 로그인 유저:", loggedInUser);
     };
@@ -127,7 +142,7 @@
     document.getElementById('recommendForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const loginId = localStorage.getItem('loggedInUser');
+        const loginId = localStorage.getItem('loggedInUser').replace(/['"]/g, '').trim();
         const tpo = document.querySelector('input[name="tpo"]:checked').value;
         const currentTemp = document.getElementById('current-temp').innerText;
 
@@ -159,7 +174,7 @@
     document.getElementById('feedbackForm').onsubmit = function(e) {
         e.preventDefault();
 
-        const loginId = localStorage.getItem('loggedInUser');
+        const loginId = localStorage.getItem('loggedInUser').replace(/['"]/g, '').trim();
         const score = document.querySelector('input[name="feedback-pref"]:checked').value;
         const currentTemp = document.getElementById('current-temp').innerText;
 

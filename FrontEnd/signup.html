@@ -43,50 +43,52 @@
 </div>
 
 <script>
-        document.getElementById('joinForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    document.getElementById('joinForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            // 1. HTML의 id와 정확히 일치하도록 수정
-            const loginId = document.getElementById('loginId').value;
-            const password = document.getElementById('password').value;
-            const nickname = document.getElementById('nickname').value;
-            const location = document.getElementById('location').value;
+        // HTML의 id와 정확히 일치하도록 가져오기
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+        const nickname = document.getElementById('nickname').value;
+        const location = document.getElementById('location').value;
 
-            /* (참고: HTML에 '비밀번호 확인' 칸이 없어서 관련 검사 로직은 삭제했습니다) */
+        // 백엔드로 보낼 데이터 포장
+        const memberData = {
+            loginId: loginId,
+            password: password,
+            nickname: nickname,
+            location: location
+        };
 
-            // 2. 백엔드로 보낼 데이터 포장
-            const memberData = {
-                loginId: loginId,
-                password: password,
-                nickname: nickname,
-                location: location
-            };
-
-            // 3. 백엔드 API로 전송
-            fetch('/api/members/signup',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(memberData)
+        // 백엔드 API로 전송
+        fetch('/api/members/signup',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(memberData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('회원가입에 실패했습니다.');
+                }
             })
-                .then(response => {
-                    if (response.ok) {
-                        return response.text();
-                    } else {
-                        throw new Error('회원가입에 실패했습니다.');
-                    }
-                })
-                .then(message => {
-                    alert(message);
-                    // 회원가입 성공 시 체질 설정 화면으로 이동!
-                    window.location.href = 'constitution.html';
-                })
-                .catch(error => {
-                    alert(error.message);
-                    console.error('Error:', error);
-                });
-        });
+            .then(message => {
+                alert(message);
+
+                // 🌟 핵심 추가: 회원가입 성공 시 브라우저 서랍장에 아이디를 쏙! 넣어줍니다 (자동 로그인) 🌟
+                localStorage.setItem('loggedInUser', loginId);
+
+                // 회원가입 성공 시 체질 설정 화면으로 이동!
+                window.location.href = 'constitution.html';
+            })
+            .catch(error => {
+                alert(error.message);
+                console.error('Error:', error);
+            });
+    });
 </script>
 </body>
 </html>
