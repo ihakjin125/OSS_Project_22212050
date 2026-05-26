@@ -58,8 +58,12 @@
         </form>
 
         <div class="recommendation-box">
-            <p class="clothes-result" id="recommend-result">[반팔] / [가벼운 아우터] / [슬랙스]</p>
+            <p class="clothes-result" id="recommend-result">여기에 추천 결과가 표시됩니다.</p>
             <p class="weather-tip">💡 기상 팁: 오후에 비 소식이 있어요. 우산을 챙기세요! ☔</p>
+
+            <p style="font-size: 12px; color: #888; margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px;">
+                ※ 위 추천 옷차림은 회원님의 옷장에 등록된 옷을 기반으로 분석한 결과입니다.
+            </p>
         </div>
 
         <button class="feedback-btn">피드백 남기기</button>
@@ -147,7 +151,7 @@
         const currentTemp = document.getElementById('current-temp').innerText;
 
         // 백엔드 RecommendationController 의 getRecommendation API 호출
-        fetch(`/api/recommendations?loginId=${loginId}&temperature=${currentTemp}&tpo=${tpo}`, {
+        fetch(`/api/main/recommendations?loginId=${loginId}&temperature=${currentTemp}&tpo=${tpo}`, {
             method: 'GET'
         })
             .then(response => {
@@ -156,7 +160,7 @@
             })
             .then(message => {
                 // 백엔드에서 준 추천 결과 텍스트를 화면에 꽂아줌
-                document.getElementById('recommend-result').innerText = message;
+                document.getElementById('recommend-result').innerHTML = message;
                 alert("추천이 완료되었습니다!");
             })
             .catch(error => {

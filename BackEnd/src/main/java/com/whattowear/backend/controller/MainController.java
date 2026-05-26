@@ -33,11 +33,16 @@ public class MainController {
         return weatherService.getCurrentWeather(location);
     }
 
-    @PostMapping("/recommend")
-    public List<Clothes> getRecommendation(@RequestBody Member member, @RequestParam Double currentTemp) {
-        return recommendationService.recommend(member, currentTemp);
+    @GetMapping("/recommendations")
+    public ResponseEntity<String> getRecommendation(
+            @RequestParam String loginId,
+            @RequestParam Double temperature,
+            @RequestParam String tpo) {
+
+        // 서비스 클래스(두뇌)에 데이터 넘기고 추천 결과 문자열로 받아오기
+        String result = recommendationService.recommendClothes(loginId, temperature, tpo);
+        return ResponseEntity.ok(result);
     }
-    // ---------------------------------------------------------
 
     // ▼ 여기서부터 프론트엔드와 통신할 [옷장 CRUD] API들 입니다! ▼
 

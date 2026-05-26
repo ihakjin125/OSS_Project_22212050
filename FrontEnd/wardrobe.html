@@ -34,7 +34,7 @@
 <script>
     // 1. 화면이 켜질 때 실행되는 함수
     window.onload = function() {
-        const loginId = localStorage.getItem('loggedInUser');
+        let loginId = localStorage.getItem('loggedInUser');
 
         // 로그인 안 했으면 로그인 화면으로 쫓아내기
         if (!loginId) {
@@ -42,6 +42,9 @@
             window.location.href = 'index.html';
             return;
         }
+
+        // 🌟 쌍따옴표 및 공백 싹둑 자르기 (400 에러 완벽 방어!)
+        loginId = loginId.replace(/['"]/g, '').trim();
 
         // 내 옷장 데이터 불러오기
         fetchClothes(loginId);
@@ -52,16 +55,16 @@
         const container = document.getElementById('clothes-container');
         container.innerHTML = '<div class="clothes-item"><span class="clothes-name">옷장을 불러오는 중...</span></div>';
 
-        // 백엔드 API 호출 (예: GET /api/clothes?loginId=qwer1234)
+        // 백엔드 API 호출
         fetch(`/api/main/clothes?loginId=${loginId}`, {
             method: 'GET'
         })
             .then(response => {
                 if (!response.ok) throw new Error("옷장 데이터를 불러오는데 실패했습니다.");
-                return response.json(); // 백엔드에서 JSON 리스트를 준다고 가정
+                return response.json();
             })
             .then(clothes => {
-                container.innerHTML = ''; // "불러오는 중..." 글자 지우기
+                container.innerHTML = '';
 
                 // 옷장이 비어있을 때
                 if (clothes.length === 0) {
@@ -73,7 +76,7 @@
                 clothes.forEach(item => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'clothes-item';
-                    // item.id는 DB에 저장된 옷의 고유 번호(PK)
+
                     itemDiv.innerHTML = `
                     <span class="clothes-name">${item.name}</span>
                     <button class="more-btn" onclick="deleteCloth(${item.id})">🗑️</button>
@@ -91,7 +94,7 @@
     function deleteCloth(clothesId) {
         if(confirm("이 옷을 옷장에서 정말 삭제할까요?")) {
 
-            // 백엔드 API 호출 (예: DELETE /api/clothes/1)
+            // 백엔드 API 호출
             fetch(`/api/main/clothes/${clothesId}`, {
                 method: 'DELETE'
             })
