@@ -46,4 +46,8 @@ public class MemberService {
         // (memberRepository.findByLoginId() 등 실제 DB 조회 로직)
         return memberRepository.findByLoginId(loginId);
     }
+
+    public void save(Member member) {
+        memberRepository.save(member);
+    }
 }

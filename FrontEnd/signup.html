@@ -29,7 +29,7 @@
                 <label>위치 정보</label>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="location" placeholder="주소를 입력하세요" required readonly>
-                    <button type="button" class="sub-btn" style="width: 80px; margin-top: 0;" onclick="alert('주소 검색 API 연동 예정')">검색</button>
+                    <button type="button" class="sub-btn" style="width: 80px; margin-top: 0;" onclick="execDaumPostcode()">검색</button>
                 </div>
             </div>
 
@@ -42,7 +42,28 @@
     </div>
 </div>
 
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
+    // 🌟 주소 검색 API 팝업을 띄우고 결과를 처리하는 함수 🌟
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                var addr = ''; // 주소 변수
+
+                // 사용자가 도로명 주소를 선택했든, 지번 주소를 선택했든 해당 값을 가져옵니다.
+                if (data.userSelectedType === 'R') {
+                    addr = data.roadAddress;
+                } else {
+                    addr = data.jibunAddress;
+                }
+
+                // 기상청 API는 상세주소(동/호수)까지는 필요 없으므로, 기본 주소만 딱 가져와서 인풋 박스에 넣습니다.
+                document.getElementById('location').value = addr;
+            }
+        }).open();
+    }
+
     document.getElementById('joinForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -78,8 +99,11 @@
             .then(message => {
                 alert(message);
 
-                // 🌟 핵심 추가: 회원가입 성공 시 브라우저 서랍장에 아이디를 쏙! 넣어줍니다 (자동 로그인) 🌟
+                // 🌟 기존에 아이디 저장하던 코드
                 localStorage.setItem('loggedInUser', loginId);
+
+                // 🌟 [여기에 딱 한 줄 추가!] 선택한 위치 정보도 브라우저에 저장해 둡니다.
+                localStorage.setItem('user_location', location);
 
                 // 회원가입 성공 시 체질 설정 화면으로 이동!
                 window.location.href = 'constitution.html';

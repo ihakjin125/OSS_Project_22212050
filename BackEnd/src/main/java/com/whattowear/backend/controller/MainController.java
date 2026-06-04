@@ -26,8 +26,7 @@ public class MainController {
     private final ClothesService clothesService;
     private final MemberService memberService;
 
-    // ---------------------------------------------------------
-    // [기존 코드 유지]
+    // 🌟 이미 완벽하게 연결해두신 날씨 API (호출 주소: /api/main/weather) 🌟
     @GetMapping("/weather")
     public WeatherData getWeather(@RequestParam String location) {
         return weatherService.getCurrentWeather(location);
@@ -90,13 +89,38 @@ public class MainController {
         return ResponseEntity.ok("옷 삭제 성공!");
     }
 
-    // 🌟 4. [닉네임 조회] 마이페이지에서 진짜 닉네임을 가져가기 위한 추가 API 🌟
+    // 4. [닉네임 조회] 마이페이지에서 진짜 닉네임을 가져가기 위한 추가 API
     @GetMapping("/member/nickname")
     public ResponseEntity<String> getNickname(@RequestParam String loginId) {
         Member owner = memberService.findByLoginId(loginId);
         if (owner == null) {
             return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
         }
-        return ResponseEntity.ok(owner.getNickname()); // 진짜 닉네임만 쏙 뽑아서 전달!
+        return ResponseEntity.ok(owner.getNickname());
+    }
+
+    // 프론트에서 넘어오는 피드백 데이터를 받을 상자
+    @Getter @Setter
+    public static class FeedbackRequest {
+        private String loginId;
+        private Double tempAtTime;
+        private Integer score;
+    }
+
+    // 5. [피드백 반영] 체질 가중치 업데이트 API
+    @PostMapping("/feedback")
+    public ResponseEntity<String> submitFeedback(@RequestBody FeedbackRequest request) {
+        Member member = memberService.findByLoginId(request.getLoginId());
+        if(member == null) return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
+
+        double currentWeight = member.getConstitutionWeight() != null ? member.getConstitutionWeight() : 0.0;
+
+        // 피드백 점수 반영
+        double updatedWeight = currentWeight + (request.getScore() * 0.5);
+        member.setConstitutionWeight(updatedWeight);
+
+        memberService.save(member);
+
+        return ResponseEntity.ok("피드백이 반영되어 체질 가중치가 업데이트되었습니다! 📈");
     }
 }

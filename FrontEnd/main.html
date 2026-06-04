@@ -33,7 +33,7 @@
 
         <div class="temp-display">
             <h2>
-                🌡️ 현재 기온 : <span id="current-temp">20</span>°C ☁️
+                🌡️ 현재 기온 : <span id="current-temp">--</span>°C <span id="weather-icon">☁️</span>
                 <button type="button" class="edit-temp-btn" onclick="editTemperature()" title="기온 수동 입력">✏️</button>
             </h2>
         </div>
@@ -59,7 +59,7 @@
 
         <div class="recommendation-box">
             <p class="clothes-result" id="recommend-result">여기에 추천 결과가 표시됩니다.</p>
-            <p class="weather-tip">💡 기상 팁: 오후에 비 소식이 있어요. 우산을 챙기세요! ☔</p>
+            <p class="weather-tip" id="weather-tip-msg">💡 날씨 데이터를 불러오고 있어요...</p>
 
             <p style="font-size: 12px; color: #888; margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px;">
                 ※ 위 추천 옷차림은 회원님의 옷장에 등록된 옷을 기반으로 분석한 결과입니다.
@@ -101,34 +101,31 @@
             </div>
 
             <button type="submit" class="main-action-btn">피드백 보내고 가중치 업데이트</button>
-            <button type="button" class="close-modal-btn" onclick="closeModal()">피드백 건너뛰기</button>
+            <button type="button" class="close-modal-btn" onclick="skipFeedback()">피드백 건너뛰기</button>
         </form>
     </div>
 </div>
 
 <script>
-    // 1. 페이지 로드 시 로그인한 유저 아이디 가져오기
+    let pendingFeedback = false;
+
     window.onload = function() {
         let loggedInUser = localStorage.getItem('loggedInUser');
 
-        // 로그인을 안 하고 주소창에 메인 화면을 치고 들어온 경우 쫓아내기
         if (!loggedInUser) {
             alert("로그인이 필요합니다!");
             window.location.href = 'index.html';
             return;
         }
 
-        // 🌟 아이디 다듬기 (쌍따옴표 제거)
         loggedInUser = loggedInUser.replace(/['"]/g, '').trim();
 
-        // 🌟 백엔드에 닉네임 물어보기!
         fetch(`/api/main/member/nickname?loginId=${loggedInUser}`)
             .then(response => {
                 if(response.ok) return response.text();
                 throw new Error("닉네임 못 가져옴");
             })
             .then(realNickname => {
-                // 모달창에 있는 이름을 '진짜 닉네임'으로 교체!
                 const nicknameElement = document.getElementById('user-nickname');
                 if(nicknameElement) {
                     nicknameElement.innerText = realNickname;
@@ -139,18 +136,54 @@
                 document.getElementById('user-nickname').innerText = "회원";
             });
 
-        console.log("현재 로그인 유저:", loggedInUser);
+        const myLocation = localStorage.getItem('user_location') || "대구광역시 남구 대명동";
+
+        fetch(`/api/main/weather?location=${encodeURIComponent(myLocation)}`)
+            .then(response => {
+                if(!response.ok) throw new Error("날씨 가져오기 실패");
+                return response.json();
+            })
+            .then(data => {
+                console.log("받아온 날씨 데이터:", data);
+
+                // 1. 기온 띄우기
+                document.getElementById('current-temp').innerText = data.currentTemp;
+
+                // 2. 🌟 백엔드에서 준 아이콘(skyStatus)으로 덮어쓰기! 🌟
+                if (data.skyStatus) {
+                    document.getElementById('weather-icon').innerText = data.skyStatus;
+
+                    // 아이콘에 따라 아래 팁 메시지도 동적으로 바꿔주면 더 좋습니다!
+                    let tipMsg = "💡 외출하기 좋은 날씨네요!";
+                    if (data.skyStatus === "☔" || data.skyStatus === "🌨️") {
+                        tipMsg = "💡 우산을 꼭 챙기세요! ☔";
+                    } else if (data.skyStatus === "⛄") {
+                        tipMsg = "💡 눈이 오고 있어요. 길이 미끄러울 수 있으니 주의하세요! ⛄";
+                    }
+                    document.getElementById('weather-tip-msg').innerText = tipMsg;
+                }
+            })
+            .catch(error => {
+                console.error("날씨 불러오기 에러:", error);
+                document.getElementById('current-temp').innerText = "20";
+                document.getElementById('weather-icon').innerText = "☁️";
+            });
     };
 
     // 2. 오늘의 옷차림 추천받기 로직 (백엔드 연동)
     document.getElementById('recommendForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // 🌟 수정된 부분: 피드백 대기 중이면 알림을 띄우고 여기서 함수를 아예 멈춰버림(return)!
+        if (pendingFeedback) {
+            alert("💡 이전 추천에 대한 피드백을 먼저 남겨주세요! (건너뛰기도 가능합니다)");
+            return; // ⛔ 여기가 빠져있어서 계속 진행됐던 겁니다!
+        }
+
         const loginId = localStorage.getItem('loggedInUser').replace(/['"]/g, '').trim();
         const tpo = document.querySelector('input[name="tpo"]:checked').value;
         const currentTemp = document.getElementById('current-temp').innerText;
 
-        // 백엔드 RecommendationController 의 getRecommendation API 호출
         fetch(`/api/main/recommendations?loginId=${loginId}&temperature=${currentTemp}&tpo=${tpo}`, {
             method: 'GET'
         })
@@ -159,9 +192,9 @@
                 return response.text();
             })
             .then(message => {
-                // 백엔드에서 준 추천 결과 텍스트를 화면에 꽂아줌
                 document.getElementById('recommend-result').innerHTML = message;
                 alert("추천이 완료되었습니다!");
+                pendingFeedback = true;
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -169,12 +202,24 @@
             });
     });
 
-    // 3. 모달 제어 (기존과 동일)
-    function openModal() { document.getElementById('feedbackModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('feedbackModal').style.display = 'none'; }
+    function openModal() {
+        if (!pendingFeedback) {
+            alert("먼저 오늘의 옷차림을 추천받아주세요! 👕");
+            return;
+        }
+        document.getElementById('feedbackModal').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('feedbackModal').classList.remove('show');
+    }
+
+    function skipFeedback() {
+        pendingFeedback = false;
+        closeModal();
+    }
     document.querySelector('.feedback-btn').onclick = openModal;
 
-    // 4. 피드백 전송 로직 (백엔드 연동)
     document.getElementById('feedbackForm').onsubmit = function(e) {
         e.preventDefault();
 
@@ -182,19 +227,15 @@
         const score = document.querySelector('input[name="feedback-pref"]:checked').value;
         const currentTemp = document.getElementById('current-temp').innerText;
 
-        // 백엔드로 보낼 피드백 포장
         const feedbackData = {
             loginId: loginId,
             tempAtTime: parseFloat(currentTemp),
             score: parseInt(score)
         };
 
-        // 백엔드 MemberController (또는 FeedbackController)의 피드백 API 호출
-        fetch('/api/members/feedback', {
+        fetch('/api/main/feedback', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(feedbackData)
         })
             .then(response => {
@@ -202,7 +243,8 @@
                 return response.text();
             })
             .then(message => {
-                alert(message); // "피드백이 반영되어 체질 가중치가 업데이트되었습니다."
+                alert(message);
+                pendingFeedback = false;
                 closeModal();
             })
             .catch(error => {
@@ -211,7 +253,6 @@
             });
     };
 
-    // 5. 기온 수동 변경 (기존과 동일)
     function editTemperature() {
         let newTemp = prompt("현재 기온을 숫자로 직접 입력해주세요 (예: 22):", "");
         if (newTemp !== null && newTemp.trim() !== "" && !isNaN(newTemp)) {

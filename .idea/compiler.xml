@@ -7,6 +7,8 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
+        <module name="OSS_Project_22212050.main" />
+        <module name="OSS_Project_22212050.test" />
         <module name="OSS_Project_22212050.BackEnd.main" />
         <module name="OSS_Project_22212050.BackEnd.test" />
       </profile>
@@ -15,9 +17,12 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="OSS_Project_22212050" options="-parameters" />
       <module name="OSS_Project_22212050.BackEnd" options="-parameters" />
       <module name="OSS_Project_22212050.BackEnd.main" options="-parameters" />
       <module name="OSS_Project_22212050.BackEnd.test" options="-parameters" />
+      <module name="OSS_Project_22212050.main" options="-parameters" />
+      <module name="OSS_Project_22212050.test" options="-parameters" />
     </option>
   </component>
 </project>
