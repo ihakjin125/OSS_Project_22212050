@@ -26,7 +26,6 @@ public class MainController {
     private final ClothesService clothesService;
     private final MemberService memberService;
 
-    // 🌟 이미 완벽하게 연결해두신 날씨 API (호출 주소: /api/main/weather) 🌟
     @GetMapping("/weather")
     public WeatherData getWeather(@RequestParam String location) {
         return weatherService.getCurrentWeather(location);
@@ -38,12 +37,9 @@ public class MainController {
             @RequestParam Double temperature,
             @RequestParam String tpo) {
 
-        // 서비스 클래스(두뇌)에 데이터 넘기고 추천 결과 문자열로 받아오기
         String result = recommendationService.recommendClothes(loginId, temperature, tpo);
         return ResponseEntity.ok(result);
     }
-
-    // ▼ 여기서부터 프론트엔드와 통신할 [옷장 CRUD] API들 입니다! ▼
 
     @Getter @Setter
     public static class ClothesRequest {
@@ -54,13 +50,9 @@ public class MainController {
         private Tpo tpo;
     }
 
-    // 1. [옷 등록]
     @PostMapping("/clothes")
     public ResponseEntity<String> addClothes(@RequestBody ClothesRequest request) {
-        System.out.println("🔎 프론트에서 넘어온 아이디: [" + request.getLoginId() + "]");
-
         Member owner = memberService.findByLoginId(request.getLoginId());
-
         if (owner == null) return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
 
         Clothes newClothes = new Clothes();
@@ -74,7 +66,6 @@ public class MainController {
         return ResponseEntity.ok("옷 등록 성공!");
     }
 
-    // 2. [내 옷장 조회]
     @GetMapping("/clothes")
     public ResponseEntity<List<Clothes>> getMyWardrobe(@RequestParam String loginId) {
         Member owner = memberService.findByLoginId(loginId);
@@ -82,14 +73,12 @@ public class MainController {
         return ResponseEntity.ok(myClothes);
     }
 
-    // 3. [옷 삭제]
     @DeleteMapping("/clothes/{id}")
     public ResponseEntity<String> deleteClothes(@PathVariable Long id) {
         clothesService.deleteClothes(id);
         return ResponseEntity.ok("옷 삭제 성공!");
     }
 
-    // 4. [닉네임 조회] 마이페이지에서 진짜 닉네임을 가져가기 위한 추가 API
     @GetMapping("/member/nickname")
     public ResponseEntity<String> getNickname(@RequestParam String loginId) {
         Member owner = memberService.findByLoginId(loginId);
@@ -99,7 +88,6 @@ public class MainController {
         return ResponseEntity.ok(owner.getNickname());
     }
 
-    // 프론트에서 넘어오는 피드백 데이터를 받을 상자
     @Getter @Setter
     public static class FeedbackRequest {
         private String loginId;
@@ -107,20 +95,15 @@ public class MainController {
         private Integer score;
     }
 
-    // 5. [피드백 반영] 체질 가중치 업데이트 API
+    // 🌟 [수정됨] 서비스 계층의 applyFeedback 로직을 호출하여 엔티티의 보호 로직을 활용 🌟
     @PostMapping("/feedback")
     public ResponseEntity<String> submitFeedback(@RequestBody FeedbackRequest request) {
-        Member member = memberService.findByLoginId(request.getLoginId());
-        if(member == null) return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
-
-        double currentWeight = member.getConstitutionWeight() != null ? member.getConstitutionWeight() : 0.0;
-
-        // 피드백 점수 반영
-        double updatedWeight = currentWeight + (request.getScore() * 0.5);
-        member.setConstitutionWeight(updatedWeight);
-
-        memberService.save(member);
-
-        return ResponseEntity.ok("피드백이 반영되어 체질 가중치가 업데이트되었습니다! 📈");
+        try {
+            // MemberService에서 가중치 업데이트 + 예외 방어 로직 수행
+            memberService.applyFeedback(request.getLoginId(), request.getScore().doubleValue());
+            return ResponseEntity.ok("피드백이 반영되어 체질 가중치가 업데이트되었습니다! 📈");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
+        }
     }
 }

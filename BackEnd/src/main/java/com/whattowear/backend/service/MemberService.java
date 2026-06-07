@@ -14,6 +14,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class MemberService {
+
     @Autowired
     private MemberRepository memberRepository;
 
@@ -41,13 +42,26 @@ public class MemberService {
         return null;
     }
 
-    // MemberService.java 안에 이 코드가 있는지 확인하고, 없으면 추가해 주세요!
     public Member findByLoginId(String loginId) {
-        // (memberRepository.findByLoginId() 등 실제 DB 조회 로직)
         return memberRepository.findByLoginId(loginId);
     }
 
     public void save(Member member) {
         memberRepository.save(member);
+    }
+
+    // 🌟 [추가됨] 사용자의 체감 온도 피드백을 받아 체질 가중치를 갱신하는 로직 🌟
+    public void applyFeedback(String loginId, Double feedbackScore) {
+        // 1. DB에서 사용자 조회
+        Member member = memberRepository.findByLoginId(loginId);
+        if (member == null) {
+            throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
+        }
+
+        // 2. Member 엔티티 내부의 가중치 계산 및 방어 로직 호출
+        member.updateConstitutionWeight(feedbackScore);
+
+        // 💡 클래스 상단의 @Transactional 덕분에 여기서 메서드가 정상 종료되면
+        // JPA가 변경된 가중치 값을 감지하고 DB에 자동으로 UPDATE 쿼리를 날려줍니다!
     }
 }
