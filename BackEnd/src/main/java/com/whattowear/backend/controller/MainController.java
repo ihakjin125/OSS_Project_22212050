@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/main")
@@ -95,15 +97,30 @@ public class MainController {
         private Integer score;
     }
 
-    // 🌟 [수정됨] 서비스 계층의 applyFeedback 로직을 호출하여 엔티티의 보호 로직을 활용 🌟
     @PostMapping("/feedback")
     public ResponseEntity<String> submitFeedback(@RequestBody FeedbackRequest request) {
         try {
-            // MemberService에서 가중치 업데이트 + 예외 방어 로직 수행
             memberService.applyFeedback(request.getLoginId(), request.getScore().doubleValue());
             return ResponseEntity.ok("피드백이 반영되어 체질 가중치가 업데이트되었습니다! 📈");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
         }
+    }
+
+    // 🌟 [추가됨] 마이페이지 UI에 기본 체질과 현재 체질을 한 번에 뿌려주기 위한 API 🌟
+    @GetMapping("/member/constitution")
+    public ResponseEntity<Map<String, Double>> getMemberConstitution(@RequestParam String loginId) {
+        Member owner = memberService.findByLoginId(loginId);
+        if (owner == null) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request 반환
+        }
+
+        // 프론트엔드로 두 개의 데이터를 Map 형태로 포장해서 보냅니다.
+        // 결과 예시: { "baseWeight": 0.0, "currentWeight": 1.5 }
+        Map<String, Double> response = new HashMap<>();
+        response.put("baseWeight", owner.getBaseConstitutionWeight());
+        response.put("currentWeight", owner.getConstitutionWeight());
+
+        return ResponseEntity.ok(response);
     }
 }

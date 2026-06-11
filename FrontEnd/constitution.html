@@ -48,13 +48,36 @@
     document.getElementById('constitutionForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // 1. 학진님이 화면에서 누른 체질 값 가져오기
         const selected = document.querySelector('input[name="temp-pref"]:checked').value;
 
-        // 추가: 선택한 체질 값을 브라우저에 임시 저장 (나중에 추천 로직에 사용)
+        // 브라우저에 임시 저장 (유지)
         localStorage.setItem('user_constitution', selected);
 
-        alert('체질 설정이 완료되었습니다!');
-        window.location.href = './main.html';
+        // 🌟 2. [가장 중요] 로그인된 아이디를 꺼내서 백엔드(DB)로 쏴주기!
+        const loginId = localStorage.getItem('loggedInUser');
+
+        if (!loginId) {
+            alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+            return;
+        }
+
+        // 백엔드에 만들어둔 API로 "이 사람 체질 이걸로 저장해줘!" 라고 요청합니다.
+        fetch(`/api/members/init-constitution?loginId=${loginId}&constitution=${selected}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if(response.ok) {
+                    alert('체질 설정이 완료되었습니다!');
+                    window.location.href = './main.html';
+                } else {
+                    alert('체질 저장에 실패했습니다. 다시 시도해주세요.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('서버와 연결할 수 없습니다.');
+            });
     });
 </script>
 </body>

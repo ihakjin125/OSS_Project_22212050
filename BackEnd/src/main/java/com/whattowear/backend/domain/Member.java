@@ -23,6 +23,10 @@ public class Member {
     private String nickname;
     private String location;
 
+    // 🌟 [추가] 사용자가 가입(또는 최초 설정)할 때 고른 [기본 체질] (절대 변경되지 않음)
+    private Double baseConstitutionWeight = 0.0;
+
+    // 🌟 [유지] 피드백을 받으며 실시간으로 달라지는 [현재 내 체질] (슬라이더의 현재 위치)
     private Double constitutionWeight = 0.0;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -33,6 +37,7 @@ public class Member {
         // 학습률(Learning Rate): 한 번의 피드백으로 체질이 너무 확 바뀌지 않도록 조절 (0.5도씩)
         double learningRate = 0.5;
 
+        // baseConstitutionWeight는 그대로 두고, 변하는 constitutionWeight만 기준으로 계산합니다.
         double currentWeight = this.constitutionWeight != null ? this.constitutionWeight : 0.0;
         double newWeight = currentWeight + (feedbackScore * learningRate);
 

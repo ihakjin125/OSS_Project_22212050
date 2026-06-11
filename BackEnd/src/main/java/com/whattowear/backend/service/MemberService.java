@@ -21,6 +21,15 @@ public class MemberService {
     private final EntityManager em;
 
     public Long join(Member member){
+        // 🌟 [추가됨] 회원가입 시점에 전달받은 체질 가중치를 '기본 체질'에도 똑같이 복사해줍니다.
+        if (member.getConstitutionWeight() != null) {
+            member.setBaseConstitutionWeight(member.getConstitutionWeight());
+        } else {
+            // 혹시라도 프론트에서 값이 안 넘어왔을 경우를 대비한 안전장치 (0.0은 보통 체질)
+            member.setBaseConstitutionWeight(0.0);
+            member.setConstitutionWeight(0.0);
+        }
+
         em.persist(member);
         return member.getId();
     }
@@ -50,18 +59,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    // 🌟 [추가됨] 사용자의 체감 온도 피드백을 받아 체질 가중치를 갱신하는 로직 🌟
     public void applyFeedback(String loginId, Double feedbackScore) {
-        // 1. DB에서 사용자 조회
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {
             throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
         }
 
-        // 2. Member 엔티티 내부의 가중치 계산 및 방어 로직 호출
         member.updateConstitutionWeight(feedbackScore);
-
-        // 💡 클래스 상단의 @Transactional 덕분에 여기서 메서드가 정상 종료되면
-        // JPA가 변경된 가중치 값을 감지하고 DB에 자동으로 UPDATE 쿼리를 날려줍니다!
     }
 }

@@ -22,10 +22,10 @@
             <div class="info-section">
                 <div class="constitution-info-box" style="margin-bottom: 15px;">
                     <p class="info-label" style="font-size: 14px; color: #777; margin-bottom: 4px;">
-                        기본 체질 : <span class="info-value" id="display-base-constitution" style="font-weight: normal;">보통 / 잘 모름</span>
+                        기본 체질 : <span class="info-value" id="display-base-constitution" style="font-weight: normal;">불러오는 중...</span>
                     </p>
                     <p class="info-label" style="font-size: 16px;">
-                        현재 내 체질 : <span class="info-value" id="display-constitution" style="font-weight: bold; color: #333;">보통 / 잘 모름</span>
+                        현재 내 체질 : <span class="info-value" id="display-constitution" style="font-weight: bold; color: #333;">불러오는 중...</span>
                     </p>
                 </div>
 
@@ -63,6 +63,7 @@
         if (loginId) {
             loginId = loginId.replace(/['"]/g, '').trim();
 
+            // 1. 닉네임 가져오기
             fetch(`/api/main/member/nickname?loginId=${loginId}`)
                 .then(response => {
                     if(response.ok) return response.text();
@@ -75,39 +76,55 @@
                     console.log("닉네임 가져오기 실패:", error);
                     document.getElementById('display-nickname').innerText = "회원";
                 });
+
+            // 🌟 2. [수정됨] 백엔드에서 기본 체질과 현재 체질 데이터를 정확하게 가져옵니다!
+            fetch(`/api/main/member/constitution?loginId=${loginId}`)
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error("체질 정보 가져오기 실패");
+                })
+                .then(data => {
+                    const baseWeight = data.baseWeight;
+                    const currentWeight = data.currentWeight;
+
+                    // 값에 맞는 텍스트를 반환하는 함수 (피드백으로 소수점이 되었을 경우를 대비해 반올림 처리)
+                    const getConstitutionText = (value) => {
+                        const rounded = Math.round(value);
+                        if (rounded <= -2) return "❄️ 매우 추위를 많이 탐";
+                        if (rounded === -1) return "🧊 추위를 조금 탐";
+                        if (rounded === 0) return "☁️ 보통 / 잘 모름";
+                        if (rounded === 1) return "☀️ 더위를 조금 탐";
+                        if (rounded >= 2) return "🔥 더위를 매우 많이 탐";
+                        return "☁️ 보통 / 잘 모름";
+                    };
+
+                    // 화면 글자 업데이트
+                    document.getElementById('display-base-constitution').innerText = getConstitutionText(baseWeight);
+                    document.getElementById('display-constitution').innerText = getConstitutionText(currentWeight);
+
+                    // 슬라이더 점(dot) 위치 업데이트 (현재 체질 기준)
+                    document.querySelectorAll('.slider-dot').forEach(dot => {
+                        dot.classList.remove('active');
+                    });
+
+                    // 피드백으로 체질이 1.5가 되어도 2번 점에 불이 들어오도록 반올림
+                    const activeDotId = 'dot-' + Math.round(currentWeight);
+                    const activeDot = document.getElementById(activeDotId);
+                    if (activeDot) {
+                        activeDot.classList.add('active');
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    document.getElementById('display-base-constitution').innerText = "오류 발생";
+                    document.getElementById('display-constitution').innerText = "오류 발생";
+                });
         }
 
-        // 🌟 [추가] 페이지가 켜질 때 저장된 위치 정보가 있다면 화면에 그려줍니다.
-        // 만약 저장된 게 없다면 기본값인 '대구광역시'를 띄웁니다.
         const savedLocation = localStorage.getItem('user_location') || "대구광역시";
         document.getElementById('display-location').innerText = '📍 ' + savedLocation;
-
-        // --- 체질 UI 코드 유지 ---
-        const baseConst = localStorage.getItem('base_constitution') || "0";
-        const savedConst = localStorage.getItem('user_constitution') || "0";
-
-        document.querySelectorAll('.slider-dot').forEach(dot => {
-            dot.classList.remove('active');
-        });
-
-        const activeDot = document.getElementById('dot-' + savedConst);
-        if (activeDot) {
-            activeDot.classList.add('active');
-        }
-
-        const constText = {
-            "-2": "❄️ 매우 추위를 많이 탐",
-            "-1": "🧊 추위를 조금 탐",
-            "0": "☁️ 보통 / 잘 모름",
-            "1": "☀️ 더위를 조금 탐",
-            "2": "🔥 더위를 매우 많이 탐"
-        };
-
-        document.getElementById('display-base-constitution').innerText = constText[baseConst];
-        document.getElementById('display-constitution').innerText = constText[savedConst];
     };
 
-    // 주소 수정용 카카오 우편번호 함수
     function execDaumPostcodeForUpdate() {
         new daum.Postcode({
             oncomplete: function(data) {
@@ -119,13 +136,9 @@
                     addr = data.jibunAddress;
                 }
 
-                // 1. 화면의 텍스트를 즉시 변경
                 document.getElementById('display-location').innerText = '📍 ' + addr;
-
-                // 🌟 [추가] 다른 페이지에 갔다가 돌아와도 기억할 수 있게 브라우저에 주소를 저장합니다.
                 localStorage.setItem('user_location', addr);
 
-                // 2. 변경된 주소를 백엔드로 전송 (DB 업데이트용)
                 let loginId = localStorage.getItem('loggedInUser');
                 if (loginId) {
                     loginId = loginId.replace(/['"]/g, '').trim();
