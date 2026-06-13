@@ -68,21 +68,21 @@ public class RecommendationService {
         // 카테고리별로 있는 것만 최대 1벌씩 뽑기 (유연한 조합)
         List<Clothes> finalOutfit = new ArrayList<>();
 
-        // 1. 상의 딱 1개 찾아서 넣기 (없으면 통과)
+        // 1. 상의 딱 1개 찾아서 넣기
         matchedClothes.stream()
-                .filter(c -> "상의".equals(c.getCategory()))
+                .filter(c -> c.getCategory() == Clothes.Category.TOP)
                 .findFirst()
                 .ifPresent(finalOutfit::add);
 
-        // 2. 하의 딱 1개 찾아서 넣기 (없으면 통과)
+        // 2. 하의 딱 1개 찾아서 넣기
         matchedClothes.stream()
-                .filter(c -> "하의".equals(c.getCategory()))
+                .filter(c -> c.getCategory() == Clothes.Category.BOTTOM)
                 .findFirst()
                 .ifPresent(finalOutfit::add);
 
-        // 3. 아우터 딱 1개 찾아서 넣기 (없으면 통과)
+        // 3. 아우터 딱 1개 찾아서 넣기
         matchedClothes.stream()
-                .filter(c -> "아우터".equals(c.getCategory()))
+                .filter(c -> c.getCategory() == Clothes.Category.OUTER)
                 .findFirst()
                 .ifPresent(finalOutfit::add);
 

@@ -33,6 +33,7 @@ public class Clothes {
 
     public interface ClothesRepository extends JpaRepository<Clothes, Long> {
         List<Clothes> findByMember(Member member);
+        List<Clothes> findByMemberAndTpo(Member member, Tpo tpo);
     }
 
     public enum Category {
