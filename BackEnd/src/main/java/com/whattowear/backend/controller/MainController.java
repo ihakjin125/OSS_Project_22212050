@@ -107,16 +107,13 @@ public class MainController {
         }
     }
 
-    // 🌟 [추가됨] 마이페이지 UI에 기본 체질과 현재 체질을 한 번에 뿌려주기 위한 API 🌟
     @GetMapping("/member/constitution")
     public ResponseEntity<Map<String, Double>> getMemberConstitution(@RequestParam String loginId) {
         Member owner = memberService.findByLoginId(loginId);
         if (owner == null) {
-            return ResponseEntity.badRequest().build(); // 400 Bad Request 반환
+            return ResponseEntity.badRequest().build();
         }
 
-        // 프론트엔드로 두 개의 데이터를 Map 형태로 포장해서 보냅니다.
-        // 결과 예시: { "baseWeight": 0.0, "currentWeight": 1.5 }
         Map<String, Double> response = new HashMap<>();
         response.put("baseWeight", owner.getBaseConstitutionWeight());
         response.put("currentWeight", owner.getConstitutionWeight());

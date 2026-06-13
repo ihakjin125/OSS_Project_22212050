@@ -57,10 +57,10 @@ public class WeatherService {
                 JsonNode location = documents.get(0);
                 coordinates.put("x", location.path("x").asDouble());
                 coordinates.put("y", location.path("y").asDouble());
-                System.out.println("✅ 카카오 변환 성공: X=" + coordinates.get("x") + ", Y=" + coordinates.get("y"));
+                System.out.println("카카오 변환 성공: X=" + coordinates.get("x") + ", Y=" + coordinates.get("y"));
             }
         } catch (Exception e) {
-            System.out.println("❌ 카카오 에러: " + e.getMessage());
+            System.out.println("카카오 에러: " + e.getMessage());
         }
         return coordinates;
     }
@@ -136,7 +136,7 @@ public class WeatherService {
             JsonNode items = objectMapper.readTree(response).path("response").path("body").path("items").path("item");
 
             double currentTemp = 0.0;
-            int ptyCode = 0; // 🌟 추가: 강수형태 코드 저장용 변수
+            int ptyCode = 0; // 강수형태 코드 저장용 변수
 
             for (JsonNode item : items) {
                 String category = item.path("category").asText();
@@ -147,7 +147,7 @@ public class WeatherService {
                 }
             }
 
-            // 🌟 PTY 코드에 따라 이모지 결정
+            // PTY 코드에 따라 이모지 결정
             String weatherIcon = "☁️"; // 기본값 (강수 없음)
             if (ptyCode == 1 || ptyCode == 4 || ptyCode == 5) {
                 weatherIcon = "☔"; // 비, 소나기 등
@@ -158,7 +158,7 @@ public class WeatherService {
             }
 
             weatherData.setCurrentTemp(currentTemp);
-            weatherData.setSkyStatus(weatherIcon); // 🌟 결정된 이모지를 데이터에 쏙 담아줍니다!
+            weatherData.setSkyStatus(weatherIcon);
 
             weatherData.setMaxTemp(currentTemp + 5.0);
             weatherData.setMinTemp(currentTemp - 5.0);

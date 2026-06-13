@@ -31,9 +31,6 @@ public class Clothes {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    // --- [여기서부터 파일 개수 줄이기용 내부 인터페이스 & Enum] ---
-    // 모두 외부(Service, Controller)에서 쓸 수 있도록 public으로 선언하고 안으로 넣었습니다.
-
     public interface ClothesRepository extends JpaRepository<Clothes, Long> {
         List<Clothes> findByMember(Member member);
     }

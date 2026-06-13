@@ -149,7 +149,7 @@
                 // 1. 기온 띄우기
                 document.getElementById('current-temp').innerText = data.currentTemp;
 
-                // 2. 🌟 백엔드에서 준 아이콘(skyStatus)으로 덮어쓰기! 🌟
+                // 2. 백엔드에서 준 아이콘(skyStatus)으로 덮어쓰기!
                 if (data.skyStatus) {
                     document.getElementById('weather-icon').innerText = data.skyStatus;
 
@@ -174,10 +174,10 @@
     document.getElementById('recommendForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // 🌟 수정된 부분: 피드백 대기 중이면 알림을 띄우고 여기서 함수를 아예 멈춰버림(return)!
+        // 피드백 대기 중이면 알림을 띄우고 여기서 함수를 아예 멈춰버림
         if (pendingFeedback) {
             alert("💡 이전 추천에 대한 피드백을 먼저 남겨주세요! (건너뛰기도 가능합니다)");
-            return; // ⛔ 여기가 빠져있어서 계속 진행됐던 겁니다!
+            return; //
         }
 
         const loginId = localStorage.getItem('loggedInUser').replace(/['"]/g, '').trim();

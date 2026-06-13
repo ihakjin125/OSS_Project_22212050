@@ -77,7 +77,7 @@
                     document.getElementById('display-nickname').innerText = "회원";
                 });
 
-            // 🌟 2. [수정됨] 백엔드에서 기본 체질과 현재 체질 데이터를 정확하게 가져옵니다!
+            // 2. 백엔드에서 기본 체질과 현재 체질 데이터를 정확하게 가져옴
             fetch(`/api/main/member/constitution?loginId=${loginId}`)
                 .then(response => {
                     if (response.ok) return response.json();

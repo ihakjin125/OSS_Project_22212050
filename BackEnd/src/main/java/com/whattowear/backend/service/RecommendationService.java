@@ -25,7 +25,7 @@ public class RecommendationService {
         List<Clothes> myClothes = clothesService.getClothesByMember(member);
         if (myClothes.isEmpty()) return "옷장이 텅 비었습니다! 옷을 먼저 등록해주세요. 👕";
 
-        // 3. TPO 변환 (프론트에서 온 'daily'를 대문자 Enum 'DAILY'로 변환)
+        // 3. TPO 변환
         Clothes.Tpo tpo;
         try {
             tpo = Clothes.Tpo.valueOf(tpoString.toUpperCase());
@@ -33,12 +33,12 @@ public class RecommendationService {
             return "잘못된 상황(TPO) 정보입니다.";
         }
 
-        // 🌟 [핵심 1] 체질 가중치 적용 🌟
+        // 체질 가중치 적용
         // 가중치 1단계당 2.0도씩 체감 온도를 보정
         double weight = member.getConstitutionWeight() != null ? member.getConstitutionWeight() : 0.0;
         double perceivedTemp = temperature + (weight * 2.0);
 
-        // 🌟 [핵심 2] 체감 온도에 따른 목표 두께(Thickness) 설정 🌟
+        // 체감 온도에 따른 목표 두께
         // 고도화된 온도 분기점 적용 (22도, 12도 기준)
         Clothes.Thickness targetThickness;
         if (perceivedTemp >= 22.0) {
@@ -49,7 +49,7 @@ public class RecommendationService {
             targetThickness = Clothes.Thickness.THICK;    // 12도 미만: 두꺼운 옷 (겨울)
         }
 
-        // 🌟 [핵심 3] 조건에 맞는 옷 1차 필터링 🌟
+        // 조건에 맞는 옷 1차 필터링
         List<Clothes> matchedClothes = myClothes.stream()
                 .filter(c -> c.getTpo() == tpo)
                 .filter(c -> c.getThickness() == targetThickness)
@@ -57,7 +57,7 @@ public class RecommendationService {
 
         boolean isFallback = false;
 
-        // [플랜 B] 2차 시도: 만약 딱 맞는 두께의 옷이 없다면? -> 같은 TPO(상황)의 다른 옷이라도 일단 가져오기!
+        // 2차 시도: 만약 딱 맞는 두께의 옷이 없다면? -> 같은 TPO(상황)의 다른 옷이라도 일단 가져오기
         if (matchedClothes.isEmpty()) {
             matchedClothes = myClothes.stream()
                     .filter(c -> c.getTpo() == tpo) // 두께 조건은 빼고 TPO만 일치하는 옷 검색
@@ -65,7 +65,7 @@ public class RecommendationService {
             isFallback = true; // 대안으로 찾았다는 표시
         }
 
-        // 🌟 [핵심 4] 카테고리별로 있는 것만 최대 1벌씩 뽑기 (유연한 조합) 🌟
+        // 카테고리별로 있는 것만 최대 1벌씩 뽑기 (유연한 조합)
         List<Clothes> finalOutfit = new ArrayList<>();
 
         // 1. 상의 딱 1개 찾아서 넣기 (없으면 통과)
@@ -98,7 +98,7 @@ public class RecommendationService {
 
         String finalResult = "[" + recommendedNames + "]";
 
-        // 플랜 B로 찾은 경우 친절한 안내 멘트 추가
+        // 대안으로 찾은 경우 안내 멘트 추가
         if (isFallback) {
             finalResult += "<br><span style='font-size: 15px; font-weight: normal; color: #ff9800; margin-top: 5px; display: inline-block;'>(💡 딱 맞는 두께가 없어 같은 상황의 다른 옷을 추천했어요!)</span>";
         }

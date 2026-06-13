@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController // 프론트엔드(HTML/JS)와 데이터를 주고받기 위한 컨트롤러
+@RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
-    // 🌟 [추가됨] 프론트엔드에서 보내는 데이터를 정확하게 받기 위한 전용 상자(DTO)
     @Getter @Setter
     public static class SignupRequest {
         private String loginId;
@@ -27,12 +26,11 @@ public class MemberController {
         private String nickname;
         private String location;
 
-        // 프론트에서 변수명을 뭘로 보낼지 몰라 둘 다 준비했습니다!
         private Double constitutionWeight;
         private Double constitution;
     }
 
-    // 1. 회원가입 API (수정됨)
+    // 1. 회원가입 API
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
         Member member = new Member();
@@ -41,13 +39,12 @@ public class MemberController {
         member.setNickname(request.getNickname());
         member.setLocation(request.getLocation());
 
-        // 🌟 [핵심] 프론트에서 보낸 체질 값을 엔티티에 직접 꽂아줍니다!
         if (request.getConstitutionWeight() != null) {
             member.setConstitutionWeight(request.getConstitutionWeight());
         } else if (request.getConstitution() != null) {
             member.setConstitutionWeight(request.getConstitution());
         } else {
-            member.setConstitutionWeight(0.0); // 아무것도 안 넘어오면 기본값 0.0
+            member.setConstitutionWeight(0.0);
         }
 
         memberService.join(member);
@@ -78,7 +75,6 @@ public class MemberController {
             return ResponseEntity.badRequest().body("회원을 찾을 수 없습니다.");
         }
 
-        // 2단계에서 고른 체질을 기본 체질과 현재 체질 모두에 덮어씌웁니다!
         member.setBaseConstitutionWeight(constitution);
         member.setConstitutionWeight(constitution);
         memberService.save(member);

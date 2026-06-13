@@ -21,11 +21,9 @@ public class MemberService {
     private final EntityManager em;
 
     public Long join(Member member){
-        // 🌟 [추가됨] 회원가입 시점에 전달받은 체질 가중치를 '기본 체질'에도 똑같이 복사해줍니다.
         if (member.getConstitutionWeight() != null) {
             member.setBaseConstitutionWeight(member.getConstitutionWeight());
         } else {
-            // 혹시라도 프론트에서 값이 안 넘어왔을 경우를 대비한 안전장치 (0.0은 보통 체질)
             member.setBaseConstitutionWeight(0.0);
             member.setConstitutionWeight(0.0);
         }

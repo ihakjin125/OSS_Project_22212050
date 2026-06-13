@@ -17,7 +17,6 @@ public class Feedback {
     private LocalDateTime createdAt;
 }
 
-// 특정 회원의 피드백 목록을 가져오기 위한 한 줄 추가
 interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findByMemberId(Long memberId);
 }

@@ -48,13 +48,13 @@
     document.getElementById('constitutionForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // 1. 학진님이 화면에서 누른 체질 값 가져오기
+        // 1. 체질 값 가져오기
         const selected = document.querySelector('input[name="temp-pref"]:checked').value;
 
         // 브라우저에 임시 저장 (유지)
         localStorage.setItem('user_constitution', selected);
 
-        // 🌟 2. [가장 중요] 로그인된 아이디를 꺼내서 백엔드(DB)로 쏴주기!
+        // 2. 로그인된 아이디를 꺼내서 백엔드(DB)로
         const loginId = localStorage.getItem('loggedInUser');
 
         if (!loginId) {
@@ -62,7 +62,6 @@
             return;
         }
 
-        // 백엔드에 만들어둔 API로 "이 사람 체질 이걸로 저장해줘!" 라고 요청합니다.
         fetch(`/api/members/init-constitution?loginId=${loginId}&constitution=${selected}`, {
             method: 'POST'
         })

@@ -85,8 +85,6 @@
             if (loginId) {
                 loginId = loginId.replace(/['"]/g, '').trim();
             }
-            // ▼ 이 줄을 추가해서 눈으로 확인해 보세요!
-            alert("지금 백엔드로 쏘려는 아이디: " + loginId);
 
             if (!loginId) {
                 alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
@@ -100,13 +98,12 @@
             const thickness = document.querySelector('input[name="thickness"]:checked').value;
             const tpo = document.querySelector('input[name="tpo"]:checked').value;
 
-            // 아이콘 매칭 (학진님의 센스 있는 로직 그대로 유지!)
             let icon = "👕";
             if (category === "BOTTOM") icon = "👖";
             if (category === "OUTER") icon = "🧥";
             const fullName = `${icon} ${name}`;
 
-            // 3. 백엔드로 보낼 JSON 데이터 예쁘게 포장하기
+            // 3. 백엔드로 보낼 JSON 데이터
             const clothesData = {
                 loginId: loginId,      // 이 옷의 주인 ID
                 name: fullName,        // 옷 이름 (아이콘 포함)
@@ -115,7 +112,7 @@
                 tpo: tpo               // WORKOUT, DAILY, FORMAL
             };
 
-            // 4. 백엔드 API로 로켓 발사! (POST 요청)
+            // 4. 백엔드 API로(POST 요청)
             fetch('/api/main/clothes', {
                 method: 'POST',
                 headers: {

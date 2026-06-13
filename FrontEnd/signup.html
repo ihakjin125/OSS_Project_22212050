@@ -45,20 +45,20 @@
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
-    // 🌟 주소 검색 API 팝업을 띄우고 결과를 처리하는 함수 🌟
+    // 주소 검색 API 팝업을 띄우고 결과를 처리하는 함수
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
                 var addr = ''; // 주소 변수
 
-                // 사용자가 도로명 주소를 선택했든, 지번 주소를 선택했든 해당 값을 가져옵니다.
+                // 사용자가 도로명 주소를 선택했든, 지번 주소를 선택했든 해당 값을 가져온다
                 if (data.userSelectedType === 'R') {
                     addr = data.roadAddress;
                 } else {
                     addr = data.jibunAddress;
                 }
 
-                // 기상청 API는 상세주소(동/호수)까지는 필요 없으므로, 기본 주소만 딱 가져와서 인풋 박스에 넣습니다.
+                // 기상청 API는  기본 주소만 가져와서 인풋 박스에 넣는다
                 document.getElementById('location').value = addr;
             }
         }).open();
@@ -72,6 +72,12 @@
         const password = document.getElementById('password').value;
         const nickname = document.getElementById('nickname').value;
         const location = document.getElementById('location').value;
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert("보안을 위해 비밀번호는 영문과 숫자를 포함하여 8자 이상으로 설정해주세요.");
+            return;
+        }
 
         // 백엔드로 보낼 데이터 포장
         const memberData = {
@@ -99,13 +105,13 @@
             .then(message => {
                 alert(message);
 
-                // 🌟 기존에 아이디 저장하던 코드
+                // 기존에 아이디 저장하던 코드
                 localStorage.setItem('loggedInUser', loginId);
 
-                // 🌟 [여기에 딱 한 줄 추가!] 선택한 위치 정보도 브라우저에 저장해 둡니다.
+                // 선택한 위치 정보도 브라우저에 저장
                 localStorage.setItem('user_location', location);
 
-                // 회원가입 성공 시 체질 설정 화면으로 이동!
+                // 회원가입 성공 시 체질 설정 화면으로 이동
                 window.location.href = 'constitution.html';
             })
             .catch(error => {

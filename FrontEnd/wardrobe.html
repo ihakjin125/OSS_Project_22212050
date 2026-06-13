@@ -43,14 +43,13 @@
             return;
         }
 
-        // 🌟 쌍따옴표 및 공백 싹둑 자르기 (400 에러 완벽 방어!)
         loginId = loginId.replace(/['"]/g, '').trim();
 
         // 내 옷장 데이터 불러오기
         fetchClothes(loginId);
     };
 
-    // 2. 백엔드에서 내 옷 목록을 가져오는 진짜 통신 로직
+    // 2. 백엔드에서 내 옷 목록을 가져오는  통신 로직
     function fetchClothes(loginId) {
         const container = document.getElementById('clothes-container');
         container.innerHTML = '<div class="clothes-item"><span class="clothes-name">옷장을 불러오는 중...</span></div>';
@@ -72,7 +71,7 @@
                     return;
                 }
 
-                // DB에서 가져온 옷들을 화면에 하나씩 그려주기
+                // DB에서 가져온 옷들을 화면에 하나씩
                 clothes.forEach(item => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'clothes-item';
