@@ -57,7 +57,7 @@ public class RecommendationService {
 
         boolean isFallback = false;
 
-        // 2차 시도: 만약 딱 맞는 두께의 옷이 없다면? -> 같은 TPO(상황)의 다른 옷이라도 일단 가져오기
+        // [Plan B] 2차 시도: 만약 딱 맞는 두께의 옷이 없다면? -> 같은 TPO(상황)의 다른 옷이라도 일단 가져오기
         if (matchedClothes.isEmpty()) {
             matchedClothes = myClothes.stream()
                     .filter(c -> c.getTpo() == tpo) // 두께 조건은 빼고 TPO만 일치하는 옷 검색
@@ -98,9 +98,12 @@ public class RecommendationService {
 
         String finalResult = "[" + recommendedNames + "]";
 
-        // 대안으로 찾은 경우 안내 멘트 추가
+        // 대안으로 찾은 경우 안내 멘트 수정
         if (isFallback) {
-            finalResult += "<br><span style='font-size: 15px; font-weight: normal; color: #ff9800; margin-top: 5px; display: inline-block;'>(💡 딱 맞는 두께가 없어 같은 상황의 다른 옷을 추천했어요!)</span>";
+            finalResult += "<br><span style='font-size: 14px; font-weight: bold; color: #ff9800; margin-top: 5px; display: inline-block;'>"
+                    + "💡 현재 날씨와 옷의 두께가 완벽하게 일치하지 않아요! "
+                    + "기온을 고려하여 옷차림을 다시 한번 확인하고 조절해서 입어주세요."
+                    + "</span>";
         }
 
         return finalResult;
